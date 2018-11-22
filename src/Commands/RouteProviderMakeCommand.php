@@ -6,6 +6,7 @@ use Nwidart\Modules\Support\Config\GenerateConfigReader;
 use Nwidart\Modules\Support\Stub;
 use Nwidart\Modules\Traits\ModuleCommandTrait;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class RouteProviderMakeCommand extends GeneratorCommand
 {
@@ -40,15 +41,29 @@ class RouteProviderMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['api', null, InputOption::VALUE_NONE, 'Indicates the api route service provider', null],
+        ];
+    }
+
+    /**
      * Get template contents.
      *
      * @return string
      */
     protected function getTemplateContents()
     {
+        $stubFile = $this->option('api') ? '/api-route-provider.stub' : '/route-provider.stub';
+
         $module = $this->laravel['modules']->findOrFail($this->getModuleName());
 
-        return (new Stub('/route-provider.stub', [
+        return (new Stub($stubFile, [
             'NAMESPACE'        => $this->getClassNamespace($module),
             'CLASS'            => $this->getFileName(),
             'MODULE_NAMESPACE' => $this->laravel['modules']->config('namespace'),
